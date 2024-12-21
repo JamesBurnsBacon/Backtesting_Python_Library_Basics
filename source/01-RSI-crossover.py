@@ -38,4 +38,4 @@ stats = bt.optimize(
 )
 
 print(stats)
-#bt.plot
+bt.plot()
