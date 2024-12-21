@@ -29,4 +29,4 @@ class RsiOscillator(Strategy):
 bt = Backtest(GOOG, RsiOscillator, cash = 10_000)
 stats = bt.run()
 print(stats)
-#bt.plot
+bt.plot()
