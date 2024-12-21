@@ -10,6 +10,8 @@ import talib
 #print(GOOG)
 
 #Simple crossover strategy
+#Long only
+#Max position size at every entry/exit
 
 class RsiOscillator(Strategy):
 
@@ -20,13 +22,20 @@ class RsiOscillator(Strategy):
     def init(self):
         self.rsi = self.I(talib.RSI, self.data.Close, self.rsi_window) #pass closing price, num periods
 
-    def next(self):
+    def next(self): 
         if crossover(self.rsi, self.upper_bound):
             self.position.close()
         elif crossover(self.lower_bound, self.rsi):
             self.buy()
 
 bt = Backtest(GOOG, RsiOscillator, cash = 10_000)
-stats = bt.run()
+stats = bt.optimize(
+    upper_bound = range(10, 85, 5),
+    lower_bound = range(10, 85, 5),
+    rsi_window = range(10, 30, 2),
+    maximize = 'Return [%]',
+    constraint = lambda param: param.upper_bound > param.lower_bound
+)
+
 print(stats)
 #bt.plot
