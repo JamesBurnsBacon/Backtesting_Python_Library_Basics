@@ -13,6 +13,13 @@ import talib
 #Long only
 #Max position size at every entry/exit
 
+def optim_func(series):
+
+    if series["# Trades"] < 10:
+        return -1 # filtering out every result with fewer than 10 trades
+    
+    return series["Equity Final [$]"] / series["Exposure Time [%]"] #Max returns for lowest time in market
+
 class RsiOscillator(Strategy):
 
     upper_bound = 70
@@ -30,12 +37,16 @@ class RsiOscillator(Strategy):
 
 bt = Backtest(GOOG, RsiOscillator, cash = 10_000)
 stats = bt.optimize(
-    upper_bound = range(10, 85, 5),
-    lower_bound = range(10, 85, 5),
+    upper_bound = range(55, 85, 5),
+    lower_bound = range(10, 45, 5),
     rsi_window = range(10, 30, 2),
-    maximize = 'Return [%]',
+    maximize = optim_func, #""
     constraint = lambda param: param.upper_bound > param.lower_bound
 )
 
 print(stats)
-bt.plot()
+
+lower_bound_result = stats["_strategy"].lower_bound
+upper_bound_result = stats["_strategy"].upper_bound
+
+bt.plot(filename=f'Backtest_HTML_Graphs/RSI_Plot-{lower_bound_result}-{upper_bound_result}.html')
